@@ -4121,9 +4121,10 @@ LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                 CancelActiveContentSearch(*s, *tab);
                 InvalidateRect(hwnd, nullptr, FALSE);
             } else {
-                tab->ClearSelection();
                 ResetMarquee(*s);
                 s->clickCollapseIndex = -1;
+                if (!ctrl && !shift && !alt) GoUp(*s);
+                else tab->ClearSelection();
             }
         } else if (!shift && (wParam == VK_LEFT || wParam == VK_RIGHT) &&
                    HandleColumnArrowKey(*s, wParam == VK_RIGHT)) {

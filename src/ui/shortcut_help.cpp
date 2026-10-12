@@ -23,7 +23,7 @@ std::vector<HelpGroup> HelpGroups() {
         {Id::HelpGroupNav, {
             {Id::HelpOpen, l10n::Pick(L"Enter / 双击", L"Enter / Double-click")},
             {Id::HelpBackForward, L"Backspace / Alt ← / →"},
-            {Id::Up, L"Alt ↑"},
+            {Id::Up, L"Esc / Alt ↑"},
             {Id::HelpGoToPath, L"Ctrl L / Alt D / F4"},
             {Id::Refresh, L"F5"},
             {Id::HelpMoveFocus, L"↑ ↓ PgUp PgDn Home End"},
