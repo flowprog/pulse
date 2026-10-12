@@ -8,6 +8,8 @@ bool HandleListCharacter(AppState& s, wchar_t ch) {
     if (GetFocus() != s.hwnd || (GetKeyState(VK_CONTROL) & 0x8000) ||
         (GetKeyState(VK_MENU) & 0x8000) || ch <= L' ' ||
         s.renameIndex >= 0 || s.filterEditing || !s.tagRenameId.empty()) return false;
+    // The terminal shortcut's translated character must not enter type-ahead.
+    if (ch == L'`' && (GetKeyState(VK_SHIFT) & 0x8000) == 0) return true;
     auto* tab = ActiveTab(s);
     if (!tab || tab->loading || !tab->snapshot || tab->content_results || IsSettingsTab(tab)) return false;
     if (s.listTypeAheadTab != tab || s.listTypeAheadFolder != tab->current_path) {

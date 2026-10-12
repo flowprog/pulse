@@ -39,6 +39,7 @@ std::vector<HelpGroup> HelpGroups() {
             {Id::Delete, L"Delete / Ctrl D"},
             {Id::PermanentDelete, L"Shift Delete"},
             {Id::Properties, L"Alt Enter"},
+            {Id::OpenTerminalHere, L"`"},
             {Id::HelpContextMenu, L"Shift F10"},
             {Id::HelpToggleTag, L"Ctrl Alt Shift 1–7"},
         }},

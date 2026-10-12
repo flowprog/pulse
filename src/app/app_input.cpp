@@ -4028,6 +4028,8 @@ LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             case A::MoveTabToNewWindow: PostMessageW(hwnd, WM_MOVE_TAB_TO_NEW_WINDOW, 0, 0); break;
             case A::None: break;
             }
+        } else if (!ctrl && !shift && !alt && wParam == VK_OEM_3) {
+            if ((lParam & (1LL << 30)) == 0) DispatchMenuCommand(*s, app::CmdOpenTerminal);
         } else if (ctrl && !shift && !alt && wParam == L'B') {
             ToggleSidebarCollapsed(*s);
         } else if (ctrl && shift && !alt && wParam == L'T' && !s->core.closed_windows.Empty()) {
