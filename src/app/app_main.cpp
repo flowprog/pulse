@@ -3327,6 +3327,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
     BOOL ret;
     while ((ret = GetMessageW(&msg, nullptr, 0, 0)) != 0) {
         if (ret == -1) break;
+        if (msg.message == WM_KEYDOWN && msg.wParam == VK_PROCESSKEY) {
+            if (AppState* target = state.core.windows.Lookup(msg.hwnd);
+                target && HandleImeTerminalShortcut(*target, msg)) continue;
+        }
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }

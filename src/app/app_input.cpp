@@ -8,6 +8,7 @@
 #include "app_updates.h"
 #include "app_internal.h"
 #include "app_input.h"
+#include <imm.h>
 #include "app_hover.h"
 #include "app_column_view.h"
 #include "details_column_menu.h"
@@ -3953,6 +3954,18 @@ void ShowKeyboardContextMenu(AppState& s) {
     if (items) ShowItemContextMenu(s, pt);
     else ShowBackgroundContextMenu(s, pt);
     InvalidateRect(s.hwnd, nullptr, FALSE);
+}
+
+bool HandleImeTerminalShortcut(AppState& s, const MSG& message) {
+    if (message.message != WM_KEYDOWN || message.wParam != VK_PROCESSKEY ||
+        message.hwnd != s.hwnd || GetFocus() != s.hwnd ||
+        (GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000) ||
+        (GetKeyState(VK_MENU) & 0x8000) || s.renameIndex >= 0 ||
+        s.filterEditing || !s.tagRenameId.empty()) return false;
+    // The original IME key is only available before TranslateMessage.
+    if (ImmGetVirtualKey(message.hwnd) != VK_OEM_3) return false;
+    SendMessageW(s.hwnd, WM_KEYDOWN, VK_OEM_3, message.lParam);
+    return true;
 }
 
 LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
