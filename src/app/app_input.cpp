@@ -12,6 +12,7 @@
 #include "app_internal.h"
 #include "selection_caps.h"
 #include "app_input.h"
+#include <imm.h>
 #include "app_hover.h"
 #include "app_hover_preview.h"
 #include "app_column_view.h"
@@ -4074,6 +4075,18 @@ void ShowKeyboardContextMenu(AppState& s) {
     InvalidateRect(s.hwnd, nullptr, FALSE);
 }
 
+bool HandleImeTerminalShortcut(AppState& s, const MSG& message) {
+    if (message.message != WM_KEYDOWN || message.wParam != VK_PROCESSKEY ||
+        message.hwnd != s.hwnd || GetFocus() != s.hwnd ||
+        (GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_SHIFT) & 0x8000) ||
+        (GetKeyState(VK_MENU) & 0x8000) || s.renameIndex >= 0 ||
+        s.filterEditing || !s.tagRenameId.empty()) return false;
+    // The original IME key is only available before TranslateMessage.
+    if (ImmGetVirtualKey(message.hwnd) != VK_OEM_3) return false;
+    SendMessageW(s.hwnd, WM_KEYDOWN, VK_OEM_3, message.lParam);
+    return true;
+}
+
 LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (!s) return DefWindowProcW(hwnd, msg, wParam, lParam);
         if (wParam == VK_ESCAPE && SysCtxPreviewDragCancel(*s)) return 0;
@@ -4149,6 +4162,8 @@ LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             case A::MoveTabToNewWindow: PostMessageW(hwnd, WM_MOVE_TAB_TO_NEW_WINDOW, 0, 0); break;
             case A::None: break;
             }
+        } else if (!ctrl && !shift && !alt && wParam == VK_OEM_3) {
+            if ((lParam & (1LL << 30)) == 0) DispatchMenuCommand(*s, app::CmdOpenTerminal);
         } else if (ctrl && !shift && !alt && wParam == L'B') {
             ToggleSidebarCollapsed(*s);
         } else if (ctrl && !shift && !alt && wParam == VK_OEM_2) {
@@ -4230,9 +4245,10 @@ LRESULT HandleKeyDown(AppState* s, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                 CancelActiveContentSearch(*s, *tab);
                 InvalidateRect(hwnd, nullptr, FALSE);
             } else {
-                tab->ClearSelection();
                 ResetMarquee(*s);
                 s->clickCollapseIndex = -1;
+                if (!ctrl && !shift && !alt) GoUp(*s);
+                else tab->ClearSelection();
             }
         } else if (!shift && (wParam == VK_LEFT || wParam == VK_RIGHT) &&
                    HandleColumnArrowKey(*s, wParam == VK_RIGHT)) {
