@@ -1,4 +1,5 @@
 #include "app_diagnostics.h"
+#include "caps_lock_tab_shortcut.h"
 #include "../common/windows_compat.h"
 #include "../ui/FluentTokens.h"
 #include "quick_access.h"
@@ -1846,6 +1847,10 @@ LRESULT CALLBACK WndProcImpl(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         if (s && HandleListCharacter(*s, static_cast<wchar_t>(wParam))) return 0;
         break;
 
+    case WM_CAPS_LOCK_NEW_TAB:
+        if (s && CanUseCapsLockTabShortcut(*s)) OpenNewTab(*s);
+        return 0;
+
     case WM_KEYDOWN:
         if (s && HandleGlobalSearchHotkeyCapture(*s, static_cast<UINT>(wParam))) return 0;
         if (s && wParam == VK_ESCAPE && s->detailsPreviewPanning) {
@@ -3535,6 +3540,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
         return rc;
     }
 
+    CapsLockTabShortcut caps_lock_shortcut(state.core);
     MSG msg{};
     BOOL ret;
     while ((ret = GetMessageW(&msg, nullptr, 0, 0)) != 0) {

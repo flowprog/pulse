@@ -255,6 +255,7 @@ void AdoptSuggestedOpenPolicy(AppState& s) {
 void NoteUserInput(AppState& any, const MSG& msg) {
     switch (msg.message) {
     case WM_KEYDOWN: case WM_SYSKEYDOWN:
+    case WM_CAPS_LOCK_NEW_TAB:
     case WM_LBUTTONDOWN: case WM_RBUTTONDOWN: case WM_MBUTTONDOWN: case WM_XBUTTONDOWN:
     case WM_LBUTTONDBLCLK: case WM_RBUTTONDBLCLK: case WM_MBUTTONDBLCLK: case WM_XBUTTONDBLCLK:
     case WM_NCLBUTTONDOWN: case WM_NCRBUTTONDOWN:
